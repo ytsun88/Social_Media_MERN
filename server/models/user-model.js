@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema({
   },
   birthday: {
     type: Date,
-    required: true,
     trim: true,
   },
   email: {
@@ -23,7 +22,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
     min: 6,
     max: 1024,
   },
@@ -52,16 +50,9 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-});
-
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
-    next();
-  } else {
-    return next();
-  }
+  googleID: {
+    type: String,
+  },
 });
 
 userSchema.methods.comparePassword = function (password, cb) {

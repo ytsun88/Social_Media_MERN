@@ -13,17 +13,19 @@ const MyPostsComponent = (props) => {
     navigate("/login");
   };
   useEffect(() => {
-    PostService.getMyPosts(currentUser.user._id)
-      .then((response) => {
-        setPostsData(
-          response.data.sort(function (a, b) {
-            return new Date(b.date) - new Date(a.date);
-          })
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (currentUser) {
+      PostService.getMyPosts(currentUser.user._id)
+        .then((response) => {
+          setPostsData(
+            response.data.sort(function (a, b) {
+              return new Date(b.date) - new Date(a.date);
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }, []);
   const handlePosting = () => {
     navigate("/post");

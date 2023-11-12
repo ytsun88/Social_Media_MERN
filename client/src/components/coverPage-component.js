@@ -10,18 +10,20 @@ const CoverPageComponent = (props) => {
   let [selectedPostID, setSelectedPostID] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
-    PostService.getAllFriendsPosts()
-      .then((response) => {
-        setAllPosts(
-          response.data.sort(function (a, b) {
-            return new Date(b.date) - new Date(a.date);
-          })
-        );
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        navigate("/");
-      });
+    if (currentUser) {
+      PostService.getAllFriendsPosts()
+        .then((response) => {
+          setAllPosts(
+            response.data.sort(function (a, b) {
+              return new Date(b.date) - new Date(a.date);
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+          navigate("/");
+        });
+    }
   }, []);
   const handleLike = (e) => {
     let currentLike = Number(

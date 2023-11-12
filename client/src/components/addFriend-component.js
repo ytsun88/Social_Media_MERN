@@ -13,9 +13,6 @@ const AddFriendComponent = (props) => {
   const handleChangeInput = (e) => {
     setInput(e.target.value.toLowerCase());
   };
-  useEffect(() => {
-    setCurrentUser(currentUser);
-  }, [currentUser]);
   const handleSearch = () => {
     FriendService.getUserByKey(input)
       .then((response) => {

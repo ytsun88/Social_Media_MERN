@@ -7,14 +7,16 @@ const MyFriendsComponent = (props) => {
   const navigate = useNavigate();
   let [friends, setFriends] = useState(null);
   useEffect(() => {
-    FriendService.getAllFriends()
-      .then((response) => {
-        setFriends(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        window.alert(err.response.data);
-      });
+    if (currentUser) {
+      FriendService.getAllFriends()
+        .then((response) => {
+          setFriends(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+          window.alert(err.response.data);
+        });
+    }
   }, []);
   const handleBack = () => {
     navigate("/login");

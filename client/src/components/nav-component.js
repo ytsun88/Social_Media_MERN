@@ -10,20 +10,22 @@ const NavComponents = (props) => {
 
   useEffect(() => {
     const fetchNotificationCount = async () => {
-      const user = JSON.parse(localStorage.getItem("user")); // get JWT token from localStorage
+      const user = localStorage.getItem("user"); // get JWT token from localStorage
 
       if (!user || !user.token) {
         // do nothing if there is no JWT token
         return;
       }
       try {
+        setCurrentUser(user);
         const response = await FriendService.checkCurrentUser();
 
         const data = response.data;
 
         if (data && data.requests !== undefined) {
+          console.log(currentUser);
           currentUser.user = data;
-          setInvitations(data.requests.length);
+          setInvitations(data.requests ? data.requests.length : 0);
         }
       } catch (error) {
         console.error(error);
