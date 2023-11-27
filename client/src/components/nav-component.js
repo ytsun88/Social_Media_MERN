@@ -6,33 +6,32 @@ import FriendService from "../services/friend.service";
 const NavComponents = (props) => {
   let { currentUser, setCurrentUser } = props;
   let [invitations, setInvitations] = useState(0);
+  let [requests, setRequests] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchNotificationCount = async () => {
-      const user = localStorage.getItem("user"); // get JWT token from localStorage
-
+  const fetchNotificationCount = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user")); // get JWT token from localStorage
       if (!user || !user.token) {
         // do nothing if there is no JWT token
         return;
       }
-      try {
-        setCurrentUser(user);
-        const response = await FriendService.checkCurrentUser();
+      setCurrentUser(user);
+      const response = await FriendService.checkCurrentUser();
 
-        const data = response.data;
+      const data = response.data;
 
-        if (data && data.requests !== undefined) {
-          console.log(currentUser);
-          currentUser.user = data;
-          setInvitations(data.requests ? data.requests.length : 0);
-        }
-      } catch (error) {
-        console.error(error);
+      if (data && data.requests !== undefined) {
+        setInvitations(data.requests ? data.requests.length : 0);
+        setRequests(data.requests ? data.requests : []);
       }
-    };
-    fetchNotificationCount();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  useEffect(() => {
+    fetchNotificationCount();
     const intervalId = setInterval(() => {
       fetchNotificationCount();
     }, 5000);
@@ -58,7 +57,7 @@ const NavComponents = (props) => {
     e.target.parentElement.parentElement.parentElement.parentElement.querySelector(
       ".badge"
     ).innerText = newInvitation;
-
+    setInvitations(newInvitation);
     FriendService.deleteInvitation(e.target.id)
       .then()
       .catch((err) => {
@@ -94,7 +93,7 @@ const NavComponents = (props) => {
     e.target.parentElement.parentElement.parentElement.parentElement.querySelector(
       ".badge"
     ).innerText = newInvitation;
-
+    setInvitations(newInvitation);
     FriendService.deleteInvitation(e.target.id)
       .then(() => {
         for (let i = 0; i < currentUser.user.requests.length; i++) {
@@ -157,14 +156,14 @@ const NavComponents = (props) => {
                 </Link>
               </li>
             )}
-            {currentUser && (
+            {currentUser && currentUser.user && (
               <li className="nav-item">
                 <Link className="nav-link btn btn-light" to="/addFriend">
                   Find Friends
                 </Link>
               </li>
             )}
-            {currentUser && (
+            {currentUser && currentUser.user && (
               <li className="nav-item">
                 <Link className="nav-link btn btn-light" to="/post">
                   Post
@@ -172,7 +171,7 @@ const NavComponents = (props) => {
               </li>
             )}
           </ul>
-          {currentUser && (
+          {currentUser && currentUser.user && (
             <div
               className="collapse navbar-collapse justify-content-end"
               id="navbarSupportedContent"
@@ -200,12 +199,10 @@ const NavComponents = (props) => {
                     aria-labelledby="navbarDropdownMenuLink"
                     style={{ padding: "1rem" }}
                   >
-                    {currentUser.user.requests.length == 0 && (
-                      <p>No invitation</p>
-                    )}
-                    {currentUser.user.requests.length > 0 && (
+                    {requests.length == 0 && <p>No invitation</p>}
+                    {requests.length > 0 && (
                       <div>
-                        {currentUser.user.requests.map((request) => (
+                        {requests.map((request) => (
                           <div
                             className="dropdown-item"
                             style={{ padding: "1rem" }}
@@ -234,15 +231,6 @@ const NavComponents = (props) => {
                     )}
                   </div>
                 </li>
-              </ul>
-            </div>
-          )}
-          {currentUser && (
-            <div
-              className="collapse navbar-collapse justify-content-end"
-              id="navbarSupportedContent"
-            >
-              <ul className="navbar-nav ">
                 <li className="nav-item dropdown ">
                   <Link
                     className="nav-link dropdown-toggle btn btn-light"
